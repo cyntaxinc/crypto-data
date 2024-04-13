@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'api-b3po-io'
+        DOCKER_IMAGE = 'cyntaxinc/crypto-data'
+        DOCKER_USERNAME = credentials('jenkins-dockerhub')
+        DOCKER_PASSWORD = credentials('jenkins-dockerhub')
     }
 
     stages {        
@@ -19,5 +21,19 @@ pipeline {
             }
         }
         
+        stage('Deploy to Docker Hub') {
+            when {
+                anyOf {
+                    branch 'main'
+                }
+            }
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_USERNAME, DOCKER_PASSWORD) {
+                        docker.image("$DOCKER_IMAGE:latest").push()
+                    }
+                }
+            }
+        }
     }
 }
