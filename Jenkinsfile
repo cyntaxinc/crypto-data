@@ -29,8 +29,10 @@ pipeline {
             }
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_USERNAME, DOCKER_PASSWORD) {
-                        docker.image("$DOCKER_IMAGE:latest").push()
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
+                        sh "docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:latest"
+                        sh "docker push $DOCKER_IMAGE:latest"
                     }
                 }
             }
