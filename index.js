@@ -5,7 +5,7 @@ const cors = require('cors');
 var cron = require('node-cron');
 require("dotenv").config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 const APIKEY = process.env.API_KEY;
 const app = express();
 
