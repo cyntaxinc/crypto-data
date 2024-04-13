@@ -1,5 +1,5 @@
 pipeline {
-    agent anyOf
+    agent any
 
     environment {
         DOCKER_IMAGE = 'api-b3po-io'
