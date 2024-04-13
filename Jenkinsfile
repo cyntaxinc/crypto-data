@@ -1,5 +1,4 @@
 pipeline {
-    // testing jenkins pipeline
     agent any
 
     environment {
