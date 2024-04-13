@@ -10,8 +10,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the application files to the working directory
-COPY . .
+# Copy only the necessary application files to the working directory
+COPY index.js ./
+COPY marquee.json ./
 
 # Expose port 6000
 EXPOSE 6000
