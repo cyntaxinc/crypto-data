@@ -21,10 +21,10 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo systemctl start docker
 
 # Create Docker network
-sudo docker network create B3PO
+sudo docker network create cyntax
 
 # Pull Nginx and Certbot images
-sudo docker pull nginx
+sudo docker pull nginx:latest
 sudo docker pull certbot/certbot
 
 # Obtain SSL certificate using Certbot
@@ -35,24 +35,26 @@ sudo docker run -it --rm -p 80:80 -p 443:443 \
     --agree-tos -m me@b3po.io -d api.b3po.io
 
 # Run Nginx container
-sudo docker run --name nginx -d --network B3PO -p 80:80 -p 443:443 \
+sudo docker run --name nginx -d --network cyntax -p 80:80 -p 443:443 \
    -v ~/nginx.conf:/etc/nginx/nginx.conf:ro \
    -v /etc/letsencrypt:/etc/letsencrypt \
    nginx
 
 # Build and run Express application container
 if [ -f "Dockerfile" ]; then
-    sudo docker build -t api-b3po-io .
-    sudo docker run --name api-b3po -d --network B3PO -p 6000:6000 \
-        --group-add $(stat -c '%g' /var/run/docker.sock) \
+    sudo docker buildx build -t api-b3po-io .
+    sudo docker run --name api-b3po -d --network cyntax --env-file ~/.env -p 6000:6000 \
         -v api-b3po-home:/var/api-b3po-home \
-        -v /var/run/docker.sock:/var/run/docker.sock \
         api-b3po-io
 else
     echo "Error: Dockerfile not found."
     exit 1
 fi
 
+sudo docker run --name nginx -d --network cyntax  -p 80:80 -p 443:443 \
+   -v ~/nginx.conf:/etc/nginx/nginx.conf:ro \
+   -v /etc/letsencrypt:/etc/letsencrypt \
+   nginx
 
 # for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -87,7 +89,7 @@ fi
 #     --agree-tos -m me@b3po.io -d api.b3po.io
 
 # sudo docker run --name nginx -d --network B3PO -p 80:80 -p 443:443 \
-#    -v ~/nginx.conf:/etc/nginx/nginx.conf:ro \
+#    -v ~/crytpo-data/nginx.conf:/etc/nginx/nginx.conf:ro \
 #    -v /etc/letsencrypt:/etc/letsencrypt \
 #    nginx
 
