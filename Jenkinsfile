@@ -33,6 +33,7 @@ pipeline {
                         sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
                         sh "docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:latest"
                         sh "docker push $DOCKER_IMAGE:latest"
+                        sh "docker logout"
                     }
                 }
             }
