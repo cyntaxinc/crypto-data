@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'cyntaxinc/crypto-data'
         DOCKER_USERNAME = credentials('jenkins-dockerhub')
         DOCKER_PASSWORD = credentials('jenkins-dockerhub')
+        PROD_SERVER = '104.131.0.135'
     }
 
     stages {        
@@ -34,6 +35,25 @@ pipeline {
                         sh "docker tag $DOCKER_IMAGE:latest $DOCKER_IMAGE:latest"
                         sh "docker push $DOCKER_IMAGE:latest"
                         sh "docker logout"
+                    }
+                }
+            }
+        }
+
+         stage('Deploy to Server') {
+            when {
+                anyOf {
+                    branch 'main'
+                }
+            }
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sshagent(credentials: ['ssh-private-key']) {
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'"
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker pull $DOCKER_IMAGE:latest'"
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker restart api-b3po'"
+                        }
                     }
                 }
             }
