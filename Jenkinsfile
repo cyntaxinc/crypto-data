@@ -48,12 +48,12 @@ pipeline {
             }
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) { 
-                            // SSH into the production server and pull the latest image
-                            sh "ssh -i -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'"
-                            sh "ssh -i -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker pull $DOCKER_IMAGE:latest'"
-                            sh "ssh -i -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker restart api-b3po'"
-                        
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sshagent(credentials: ['ssh-private-key']) {
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'"
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker pull $DOCKER_IMAGE:latest'"
+                            sh "ssh -o StrictHostKeyChecking=no $root@$PROD_SERVER 'sudo docker restart api-b3po'"
+                        }
                     }
                 }
             }
